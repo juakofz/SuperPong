@@ -6,8 +6,6 @@
 
 extern SDL_Window* gWindow;
 
-//i am small change 
-
 class Paddle :
 	public GameObject
 {
