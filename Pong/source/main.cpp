@@ -1,6 +1,16 @@
 #pragma once
 #include <iostream>
-#include "SDL.h"
+#include <SDL.h>
+#include "Globals.h"
+#include "Paddle.h"
+
+// ------------------------------------------------- Global objects
+
+//The window we'll be rendering to
+SDL_Window* gWindow = NULL;
+
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
 
 // ------------------------------------------------- SDL functions
 
@@ -13,19 +23,12 @@ bool loadMedia();
 //Shuts down SDL
 void close();
 
-// ------------------------------------------------- Global objects and constants
-
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-//The window we'll be rendering to
-SDL_Window* gWindow = NULL;
-
-//The window renderer
-SDL_Renderer* gRenderer = NULL;
-
 // ------------------------------------------------- Game parameters
+
+//Background square parameters
+int bg_margin_x = 20;
+int bg_margin_y = 20;
+int bg_thichness = 5;
 
 //Paddle parameters
 int paddle_w = 10;
@@ -49,22 +52,21 @@ int main(int argc, char* args[])
 		printf("Failed to load media!");
 		return -1;
 	}
-
 	//Main loop flag
 	bool f_quit = false;
 
 	//Event handler
 	SDL_Event e;
-	
-	SDL_Rect pad_left =  { paddle_margin_x - (paddle_w / 2),
-		                   (SCREEN_HEIGHT / 2) - (paddle_h / 2),
-						   paddle_w,
-						   paddle_h };
 
-	SDL_Rect pad_right = { SCREEN_WIDTH - paddle_margin_x - (paddle_w / 2),
-						   (SCREEN_HEIGHT / 2) - (paddle_h / 2),
-						   paddle_w,
-						   paddle_h };
+	//Paddles
+	Paddle pad_left(1, (float)paddle_margin_x, (float) SCREEN_HEIGHT / 2.0);
+	Paddle pad_right(2, (float) (SCREEN_WIDTH - paddle_margin_x), (float) SCREEN_HEIGHT / 2.0);
+
+	//Background rectangle
+	SDL_Rect bg_white{ bg_margin_x, bg_margin_y,
+					   SCREEN_WIDTH - 2 * bg_margin_x, SCREEN_HEIGHT - 2 * bg_margin_y };
+	SDL_Rect bg_black{ bg_margin_x + bg_thichness, bg_margin_y + bg_thichness,
+					   SCREEN_WIDTH - 2 * (bg_margin_x + bg_thichness), SCREEN_HEIGHT - 2 * (bg_margin_y + bg_thichness) };
 
 	//While application is running
 	while (!f_quit)
@@ -94,20 +96,17 @@ int main(int argc, char* args[])
 		}
 
 		//Key is down
-		const Uint8* state = SDL_GetKeyboardState(NULL);
-		if (state[SDL_SCANCODE_UP]) {
-			pad_left.y -= paddle_speed;
-		}
-		if (state[SDL_SCANCODE_DOWN]) {
-			pad_left.y += paddle_speed;
-		}
+		pad_left.processKeys();
+		pad_right.processKeys();
+
+		/*
 		if (state[SDL_SCANCODE_W]) {
 			pad_right.y -= paddle_speed;
 		}
 		if (state[SDL_SCANCODE_S]) {
 			pad_right.y += paddle_speed;
 		}
-		/*if (state[SDL_SCANCODE_LEFT]) {
+		if (state[SDL_SCANCODE_LEFT]) {
 			bob.x -= speed;
 		}
 		if (state[SDL_SCANCODE_RIGHT]) {
@@ -118,10 +117,17 @@ int main(int argc, char* args[])
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(gRenderer);
 
-		//Render paddles filled quad
+		//Render background rectangles
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		SDL_RenderFillRect(gRenderer, &pad_left); //Left paddle
-		SDL_RenderFillRect(gRenderer, &pad_right); //Right paddle
+		SDL_RenderFillRect(gRenderer, &bg_white); //white line
+
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
+		SDL_RenderFillRect(gRenderer, &bg_black); //black interior
+
+
+		//Render paddles filled quad
+		pad_left.render(gRenderer);
+		pad_right.render(gRenderer);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(gWindow);
