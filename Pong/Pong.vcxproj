@@ -19,14 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Ball.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Paddle.cpp" />
+    <ClCompile Include="source\Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\Ball.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\Globals.h" />
     <ClInclude Include="source\Paddle.h" />
+    <ClInclude Include="source\Vector2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

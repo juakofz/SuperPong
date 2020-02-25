@@ -1,22 +1,35 @@
 #pragma once
 #include <SDL.h>
+#include "Globals.h"
+#include "Vector2.h"
+
 
 class GameObject
 {
 public:
-	GameObject(): m_c_x(0), m_c_y(0), m_v_x(0), m_v_y(0) {};
-	GameObject(float px, float py) : m_c_x(px), m_c_y(px), m_v_x(0), m_v_y(0) {};
+	GameObject(): m_cen(0, 0), m_vel(0, 0) {};
+	GameObject(float px, float py) : m_cen(px, py), m_vel(0, 0) {};
 	~GameObject();
 
 	virtual void render(SDL_Renderer* renderer) = 0;
 	virtual void processKeys() = 0;
 
+	//Getters and setters
+	virtual void setPos(float cx, float cy) = 0;
+	virtual void setPos(Vector2 cen) = 0;
+	Vector2 getPos();
+
+	void setVel(Vector2 vel);
+	Vector2 getVel();
+
 protected:
 	
 	//Position
-	float m_c_x, m_c_y;
+	Vector2 m_cen;
+	Vector2 m_next_cen;
+
 	//Velocity
-	float m_v_x, m_v_y;
+	Vector2 m_vel;
 
 };
 

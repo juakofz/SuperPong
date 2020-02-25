@@ -7,6 +7,14 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+// ------------------------------------------------- Enums
+
+enum en_axis {
+    AXIS_X,
+    AXIS_Y
+};
+
+
 // ------------------------------------------------- Useful functions
 
 template <typename T>

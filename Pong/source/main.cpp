@@ -3,6 +3,8 @@
 #include <SDL.h>
 #include "Globals.h"
 #include "Paddle.h"
+#include "Ball.h"
+
 
 // ------------------------------------------------- Global objects
 
@@ -26,9 +28,9 @@ void close();
 // ------------------------------------------------- Game parameters
 
 //Background square parameters
-int bg_margin_x = 20;
-int bg_margin_y = 20;
-int bg_thichness = 5;
+int bg_margin_x = 25;
+int bg_margin_y = 25;
+int bg_thickness = 5;
 
 //Paddle parameters
 int paddle_w = 10;
@@ -62,11 +64,14 @@ int main(int argc, char* args[])
 	Paddle pad_left(1, (float)paddle_margin_x, (float) SCREEN_HEIGHT / 2.0);
 	Paddle pad_right(2, (float) (SCREEN_WIDTH - paddle_margin_x), (float) SCREEN_HEIGHT / 2.0);
 
-	//Background rectangle
-	SDL_Rect bg_white{ bg_margin_x, bg_margin_y,
-					   SCREEN_WIDTH - 2 * bg_margin_x, SCREEN_HEIGHT - 2 * bg_margin_y };
-	SDL_Rect bg_black{ bg_margin_x + bg_thichness, bg_margin_y + bg_thichness,
-					   SCREEN_WIDTH - 2 * (bg_margin_x + bg_thichness), SCREEN_HEIGHT - 2 * (bg_margin_y + bg_thichness) };
+	//Ball
+	Ball ball((float)SCREEN_WIDTH / 2.0, (float)SCREEN_HEIGHT / 2.0, 0.2, -0.2);
+
+	//Background rectangle. Black rect marks interior perimeter
+	SDL_Rect bg_white{ bg_margin_x - bg_thickness, bg_margin_y - bg_thickness,
+					   SCREEN_WIDTH - 2 * (bg_margin_x - bg_thickness) , SCREEN_HEIGHT - 2 * (bg_margin_y - bg_thickness) };
+	SDL_Rect bg_black{ bg_margin_x, bg_margin_y,
+					   SCREEN_WIDTH - 2 * (bg_margin_x), SCREEN_HEIGHT - 2 * (bg_margin_y) };
 
 	//While application is running
 	while (!f_quit)
@@ -99,19 +104,10 @@ int main(int argc, char* args[])
 		pad_left.processKeys();
 		pad_right.processKeys();
 
-		/*
-		if (state[SDL_SCANCODE_W]) {
-			pad_right.y -= paddle_speed;
-		}
-		if (state[SDL_SCANCODE_S]) {
-			pad_right.y += paddle_speed;
-		}
-		if (state[SDL_SCANCODE_LEFT]) {
-			bob.x -= speed;
-		}
-		if (state[SDL_SCANCODE_RIGHT]) {
-			bob.x += speed;
-		}*/
+		//Move
+		ball.move(pad_left, pad_right, bg_black);
+		pad_left.move();
+		pad_right.move();
 
 		//Clear screen
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -128,6 +124,7 @@ int main(int argc, char* args[])
 		//Render paddles filled quad
 		pad_left.render(gRenderer);
 		pad_right.render(gRenderer);
+		ball.render(gRenderer);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(gWindow);
