@@ -14,13 +14,13 @@ As of time of creation, the program just generates a back window where two white
 - Moving the paddles into the ball traps the ball inside the paddle
 
 ## P 0.3 ToDo list:
-[x] Add timers to cap fps
-[x] Add text and score
-[ ] Use normals for automatic reflection calculation in collisions
-[ ] Use the whole ball for collision instead of just the center for extra accurate collisions (should fix corners bug)
+- [x] Add timers to cap fps
+- [x] Add text and score
+- [ ] Use normals for automatic reflection calculation in collisions
+- [ ] Use the whole ball for collision instead of just the center for extra accurate collisions (should fix collision bugs)
 
 ## P 0.4 ToDO list:
-[ ] Add different game states
-[ ] Add start screen
-[ ] Add pause screen (with info)
-[ ] Add end confirmation screen
+- [ ] Add different game states
+- [ ] Add start screen
+- [ ] Add pause screen (with info)
+- [ ] Add end confirmation screen
