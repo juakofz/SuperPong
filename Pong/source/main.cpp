@@ -2,8 +2,11 @@
 #include <iostream>
 #include <SDL.h>
 #include "Globals.h"
+#include "Text.h"
+#include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
+#include "DashedLine.h"
 
 
 // ------------------------------------------------- Global objects
@@ -25,21 +28,8 @@ bool loadMedia();
 //Shuts down SDL
 void close();
 
-// ------------------------------------------------- Game parameters
 
-//Background square parameters
-int bg_margin_x = 25;
-int bg_margin_y = 25;
-int bg_thickness = 5;
-
-//Paddle parameters
-int paddle_w = 10;
-int paddle_h = 50;
-int paddle_margin_x = 50;
-int paddle_margin_y = 50;
-float paddle_speed = 1;
-
-// ------------------------------------------------- Main loop
+//--------------------------------------------------------------------- Main
 
 int main(int argc, char* args[])
 {
@@ -60,22 +50,50 @@ int main(int argc, char* args[])
 	//Event handler
 	SDL_Event e;
 
+	//------------------------------------------------------------------------- Game objects and variables
+
+	//Player score
+	int score_p1{ 0 }, score_p2{ 0 };
+
 	//Paddles
-	Paddle pad_left(1, (float)paddle_margin_x, (float) SCREEN_HEIGHT / 2.0);
-	Paddle pad_right(2, (float) (SCREEN_WIDTH - paddle_margin_x), (float) SCREEN_HEIGHT / 2.0);
+	Paddle pad_left(PLAYER_1, (float)g_paddle_margin_x, (float) (g_margin_top + g_game_area_y / 2) );
+	Paddle pad_right(PLAYER_2, (float) (g_screen_width - g_paddle_margin_x), (float)(g_margin_top + g_game_area_y / 2) );
 
 	//Ball
-	Ball ball((float)SCREEN_WIDTH / 2.0, (float)SCREEN_HEIGHT / 2.0, 0.2, -0.2);
+	Ball ball((float)g_screen_width / 2.0, (float)g_screen_height / 2.0, Vector2{ 1, -1 }, &score_p1, &score_p2 );
 
-	//Background rectangle. Black rect marks interior perimeter
-	SDL_Rect bg_white{ bg_margin_x - bg_thickness, bg_margin_y - bg_thickness,
-					   SCREEN_WIDTH - 2 * (bg_margin_x - bg_thickness) , SCREEN_HEIGHT - 2 * (bg_margin_y - bg_thickness) };
-	SDL_Rect bg_black{ bg_margin_x, bg_margin_y,
-					   SCREEN_WIDTH - 2 * (bg_margin_x), SCREEN_HEIGHT - 2 * (bg_margin_y) };
+	//Background rectangle. Black rect follows interior perimeter (game area)
+	SDL_Rect bg_white{ g_margin_x - g_thickness, g_margin_top - g_thickness,
+					   g_game_area_x + 2 * g_thickness , g_game_area_y + 2 * g_thickness };
+	SDL_Rect bg_black{ g_margin_x, g_margin_top,
+					   g_game_area_x, g_game_area_y };
+
+	//Center dashed line
+	DashedLine center_line(	g_margin_x + g_game_area_x/2, g_margin_top, 
+							g_px_size, g_game_area_y, 2 * g_px_size);
+
+	//Text
+	Text text_score_p1(gRenderer);
+	Text text_score_p2(gRenderer);
+	std::string font = "font/visitor1.ttf";
+	//std::string font = "font/Gamer.ttf";
+	int score_size = 80;
+
+	SDL_Color color_white{ 0xFF, 0xFF, 0xFF, 0xFF }; //White
+	SDL_Color color_black{ 0x00, 0x00, 0x00, 0xFF }; //White
+
+	//FPS cap variables
+	Timer fps_timer, cap_timer;
+	int countedFrames = 0;
+	fps_timer.start();
+
+	//------------------------------------------------------------------------- Main loop
 
 	//While application is running
 	while (!f_quit)
 	{
+		cap_timer.start(); //FPS cap
+
 		//Handle events on queue
 		while (SDL_PollEvent(&e) != 0)
 		{
@@ -100,6 +118,20 @@ int main(int argc, char* args[])
 			}
 		}
 
+		//--------------------------------------------------------------------- FPS counter
+
+		//Calculate de fps
+		float avgFPS = countedFrames / (fps_timer.getTicks() / 1000.f);
+		if (avgFPS > 2000000) avgFPS = 0;
+		if (fps_timer.getTicks() > 2000)
+		{
+			countedFrames = 0;
+			fps_timer.start();
+		}
+		//std::cout << "FPS: " << avgFPS << std::endl;
+
+		//--------------------------------------------------------------------- Game
+
 		//Key is down
 		pad_left.processKeys();
 		pad_right.processKeys();
@@ -108,6 +140,17 @@ int main(int argc, char* args[])
 		ball.move(pad_left, pad_right, bg_black);
 		pad_left.move();
 		pad_right.move();
+
+		//Update score and text
+
+		text_score_p1.free();
+		text_score_p1.loadText(std::to_string(score_p1), font, score_size, color_white);
+
+		text_score_p2.free();
+		text_score_p2.loadText(std::to_string(score_p2), font, score_size, color_white);
+
+
+		//--------------------------------------------------------------------- Rendering
 
 		//Clear screen
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -120,8 +163,14 @@ int main(int argc, char* args[])
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(gRenderer, &bg_black); //black interior
 
+		//Render center lines
+		center_line.render(gRenderer);
 
-		//Render paddles filled quad
+		//Render score text
+		text_score_p1.render(gRenderer, g_screen_width/2 - 10, g_margin_top, RIGHT);
+		text_score_p2.render(gRenderer, g_screen_width/2 + 22, g_margin_top, LEFT);
+
+		//Render paddles and ball
 		pad_left.render(gRenderer);
 		pad_right.render(gRenderer);
 		ball.render(gRenderer);
@@ -131,6 +180,16 @@ int main(int argc, char* args[])
 
 		//Update screen
 		SDL_RenderPresent(gRenderer);
+
+		//--------------------------------------------------------------------- FPS cap
+
+		++countedFrames;
+		int frameTicks = cap_timer.getTicks();
+		if (frameTicks < g_ticks_per_frame) //If frame finished early (cap)
+		{
+			//Wait remaining time
+			SDL_Delay(g_ticks_per_frame - frameTicks);
+		}
 
 	}
 
@@ -150,8 +209,23 @@ bool init()
 		return false;
 	}
 
+	//Initialize PNG loading
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags))
+	{
+		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+		return false;
+	}
+
+	//Initialize SDL_ttf
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+		return false;
+	}
+
 	//Create window
-	gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, g_screen_width, g_screen_height, SDL_WINDOW_SHOWN);
 	if (gWindow == NULL)
 	{
 		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());

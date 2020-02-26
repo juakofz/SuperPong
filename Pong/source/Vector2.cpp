@@ -174,8 +174,8 @@ bool Vector2::intersectSegments(Vector2 o1, Vector2 f1, Vector2 o2, Vector2 f2, 
 	SDL_Rect bound{ min_x, min_y, max_x - min_x, max_y - min_y };*/
 
 	//Check for intersection inside region
-	SDL_Rect bound1{ std::min(o1.x, f1.x), std::min(o1.y, f1.y), abs(f1.x - o1.x), abs(f1.y - o1.y)};
-	SDL_Rect bound2{ std::min(o2.x, f2.x), std::min(o2.y, f2.y), abs(f2.x - o2.x), abs(f2.y - o2.y) };
+	SDL_Rect bound1{ (int)std::min(o1.x, f1.x), (int)std::min(o1.y, f1.y), (int)abs(f1.x - o1.x), (int)abs(f1.y - o1.y)};
+	SDL_Rect bound2{ (int)std::min(o2.x, f2.x), (int)std::min(o2.y, f2.y), (int)abs(f2.x - o2.x), (int)abs(f2.y - o2.y) };
 
 	if (pointInRect(intersection, o1, f1) && pointInRect(intersection, o2, f2))
 	{

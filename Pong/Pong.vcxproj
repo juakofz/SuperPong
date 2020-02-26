@@ -20,16 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Ball.cpp" />
+    <ClCompile Include="source\DashedLine.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
+    <ClCompile Include="source\Globals.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Paddle.cpp" />
+    <ClCompile Include="source\Text.cpp" />
+    <ClCompile Include="source\Timer.cpp" />
     <ClCompile Include="source\Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Ball.h" />
+    <ClInclude Include="source\DashedLine.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\Globals.h" />
     <ClInclude Include="source\Paddle.h" />
+    <ClInclude Include="source\Text.h" />
+    <ClInclude Include="source\Timer.h" />
     <ClInclude Include="source\Vector2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -94,6 +101,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\jofernandez\Documents\Visual Studio 2019\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\jofernandez\Documents\Visual Studio 2019\Libraries\SDL2-2.0.10\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -108,7 +117,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -133,10 +142,11 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

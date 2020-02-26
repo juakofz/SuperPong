@@ -8,6 +8,7 @@ Paddle::Paddle(int player, float cx, float cy)
 	render_rect.h = m_height;
 
 	setPos(cx, cy);
+	m_margin_x = (int)(cx - g_margin_x);
 }
 
 void Paddle::render(SDL_Renderer* renderer)
@@ -22,20 +23,20 @@ void Paddle::processKeys()
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	switch (m_player)
 	{
-	case 1:
-		if (state[SDL_SCANCODE_UP]) {
-			m_vel.y = -m_max_speed;
-		}
-		if (state[SDL_SCANCODE_DOWN]) {
-			m_vel.y = m_max_speed;
-		}
-		break;
-	
-	case 2:
+	case PLAYER_1:
 		if (state[SDL_SCANCODE_W]) {
 			m_vel.y = -m_max_speed;
 		}
 		if (state[SDL_SCANCODE_S]) {
+			m_vel.y = m_max_speed;
+		}
+		break;
+	
+	case PLAYER_2:
+		if (state[SDL_SCANCODE_UP]) {
+			m_vel.y = -m_max_speed;
+		}
+		if (state[SDL_SCANCODE_DOWN]) {
 			m_vel.y = m_max_speed;
 		}
 		break;
@@ -47,12 +48,12 @@ void Paddle::processKeys()
 
 void Paddle::setPos(float cx, float cy)
 {
-	cx = clip(cx, (float)m_margin_x, (float) SCREEN_WIDTH - m_margin_x);
-	cy = clip(cy, (float)m_margin_y, (float)SCREEN_HEIGHT - m_margin_y);
+	//Restrict paddle movement
+	cy = clip(cy, (float)(g_margin_top + m_margin_y), (float)(g_screen_height - g_margin_bot - m_margin_y) );
 
 	m_cen.set(cx, cy);
-	render_rect.x = cx - m_width / 2;
-	render_rect.y = cy - m_height / 2;
+	render_rect.x = (int)(cx - m_width / 2);
+	render_rect.y = (int)(cy - m_height / 2);
 }
 
 void Paddle::setPos(Vector2 pos)
