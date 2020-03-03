@@ -1,30 +1,31 @@
 #pragma once
 #include <iostream>
+#include <SDL.h>
 #include "Globals.h"
 #include "GameObject.h"
-#include <SDL.h>
+#include "Quad.h"
 
 extern SDL_Window* gWindow;
+
+class InteractionObserver;
 
 class Paddle :
 	public GameObject
 {
+	friend class InteractionObserver;
+
 public:
 
 	Paddle(int player, float cx, float cy);
 	
 	void render(SDL_Renderer* renderer);
 	void processKeys();
-	void move();
+	void move(float max_mov);
 	
-	void setPos(float cx, float cy);
-	void setPos(Vector2 pos);
-	SDL_Rect getRect();
+	void setCen(float cx, float cy);
+	void setCen(Vector2 pos);
 	SDL_Point getSize();
-	Vector2 getTopRight();
-	Vector2 getTopLeft();
-	Vector2 getBotRight();
-	Vector2 getBotLeft();
+	Quad getQuad();
 
 private:
 
@@ -40,6 +41,6 @@ private:
 
 	int m_player;
 
-	SDL_Rect render_rect;
+	Quad m_object_quad;
 };
 

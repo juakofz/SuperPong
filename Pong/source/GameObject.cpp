@@ -5,7 +5,7 @@ GameObject::~GameObject()
 	return;
 }
 
-Vector2 GameObject::getPos()
+Vector2 GameObject::getCen()
 {
 	return m_cen;
 }

@@ -7,6 +7,7 @@
 #include "Paddle.h"
 #include "Ball.h"
 #include "DashedLine.h"
+#include "InteractionObserver.h"
 
 
 // ------------------------------------------------- Global objects
@@ -52,6 +53,7 @@ int main(int argc, char* args[])
 
 	//------------------------------------------------------------------------- Game objects and variables
 
+
 	//Player score
 	int score_p1{ 0 }, score_p2{ 0 };
 
@@ -67,6 +69,12 @@ int main(int argc, char* args[])
 					   g_game_area_x + 2 * g_thickness , g_game_area_y + 2 * g_thickness };
 	SDL_Rect bg_black{ g_margin_x, g_margin_top,
 					   g_game_area_x, g_game_area_y };
+
+	//Interaction observer
+	InteractionObserver observer(&score_p1, &score_p2, &bg_black);
+	observer.add(&pad_left);
+	observer.add(&pad_right);
+	observer.add(&ball);
 
 	//Center dashed line
 	DashedLine center_line(	g_margin_x + g_game_area_x/2, g_margin_top, 
@@ -137,9 +145,8 @@ int main(int argc, char* args[])
 		pad_right.processKeys();
 
 		//Move
-		ball.move(pad_left, pad_right, bg_black);
-		pad_left.move();
-		pad_right.move();
+		observer.movePaddles();
+		observer.moveBalls();
 
 		//Update score and text
 

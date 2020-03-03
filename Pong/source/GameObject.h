@@ -15,9 +15,9 @@ public:
 	virtual void processKeys() = 0;
 
 	//Getters and setters
-	virtual void setPos(float cx, float cy) = 0;
-	virtual void setPos(Vector2 cen) = 0;
-	Vector2 getPos();
+	virtual void setCen(float cx, float cy) = 0;
+	virtual void setCen(Vector2 cen) = 0;
+	Vector2 getCen();
 
 	void setVel(Vector2 vel);
 	Vector2 getVel();

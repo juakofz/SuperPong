@@ -2,19 +2,18 @@
 
 Paddle::Paddle(int player, float cx, float cy)
 {
+	m_object_quad.setSize(m_width, m_height);
+
 	m_player = player;
-
-	render_rect.w = m_width;
-	render_rect.h = m_height;
-
-	setPos(cx, cy);
 	m_margin_x = (int)(cx - g_margin_x);
+
+	setCen(cx, cy);
 }
 
 void Paddle::render(SDL_Renderer* renderer)
 {
 	SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
-	SDL_RenderFillRect(renderer, &render_rect); //Left paddle
+	SDL_RenderFillRect(renderer, &m_object_quad.getRect()); //Left paddle
 }
 
 void Paddle::processKeys()
@@ -46,24 +45,18 @@ void Paddle::processKeys()
 	
 }
 
-void Paddle::setPos(float cx, float cy)
+void Paddle::setCen(float cx, float cy)
 {
 	//Restrict paddle movement
 	cy = clip(cy, (float)(g_margin_top + m_margin_y), (float)(g_screen_height - g_margin_bot - m_margin_y) );
 
 	m_cen.set(cx, cy);
-	render_rect.x = (int)(cx - m_width / 2);
-	render_rect.y = (int)(cy - m_height / 2);
+	m_object_quad.setCenter(cx, cy);
 }
 
-void Paddle::setPos(Vector2 pos)
+void Paddle::setCen(Vector2 pos)
 {
-	setPos(pos.x, pos.y);
-}
-
-SDL_Rect Paddle::getRect()
-{
-	return render_rect;
+	setCen(pos.x, pos.y);
 }
 
 SDL_Point Paddle::getSize()
@@ -71,30 +64,15 @@ SDL_Point Paddle::getSize()
 	return SDL_Point{m_width, m_height};
 }
 
-Vector2 Paddle::getTopRight()
+Quad Paddle::getQuad()
 {
-	return 	Vector2{ m_cen.x + m_width / 2, m_cen.y - m_height / 2 };
+	return m_object_quad;
 }
 
-Vector2 Paddle::getTopLeft()
+void Paddle::move(float max_mov)
 {
-	return 	Vector2{ m_cen.x - m_width / 2, m_cen.y - m_height / 2 };
-}
-
-Vector2 Paddle::getBotRight()
-{
-	return 	Vector2{ m_cen.x + m_width / 2, m_cen.y + m_height / 2 };
-}
-
-Vector2 Paddle::getBotLeft()
-{
-	return 	Vector2{ m_cen.x - m_width / 2, m_cen.y + m_height / 2 };
-}
-
-void Paddle::move()
-{
-	Vector2 new_pos = m_cen + m_vel;
-	setPos(new_pos);
-	m_vel.zero();
+	Vector2 new_cen = m_cen + m_vel.norm(max_mov);
+	setCen(new_cen); //Move to new center
+	m_vel.zero(); //Cancel velocity
 }
 

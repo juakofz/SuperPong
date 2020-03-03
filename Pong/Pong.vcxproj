@@ -23,8 +23,10 @@
     <ClCompile Include="source\DashedLine.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\Globals.cpp" />
+    <ClCompile Include="source\InteractionObserver.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Paddle.cpp" />
+    <ClCompile Include="source\Quad.cpp" />
     <ClCompile Include="source\Text.cpp" />
     <ClCompile Include="source\Timer.cpp" />
     <ClCompile Include="source\Vector2.cpp" />
@@ -34,7 +36,9 @@
     <ClInclude Include="source\DashedLine.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\Globals.h" />
+    <ClInclude Include="source\InteractionObserver.h" />
     <ClInclude Include="source\Paddle.h" />
+    <ClInclude Include="source\Quad.h" />
     <ClInclude Include="source\Text.h" />
     <ClInclude Include="source\Timer.h" />
     <ClInclude Include="source\Vector2.h" />
@@ -140,6 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <DisableSpecificWarnings>C26444;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

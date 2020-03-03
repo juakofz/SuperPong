@@ -2,146 +2,139 @@
 
 Ball::Ball() :GameObject()
 {
-	render_rect.w = m_size;
-	render_rect.h = m_size;
+	m_object_quad.setSize(m_size, m_size);
 	m_dist_rem = m_vel.mod();
-	p_score_p1 = NULL;
-	p_score_p2 = NULL;
 }
 
 Ball::Ball(float cx, float cy, Vector2 dir, int* score_p1, int* score_p2)
 {
-	render_rect.w = m_size;
-	render_rect.h = m_size;
+	m_object_quad.setSize(m_size, m_size);
 	m_dist_rem = m_vel.mod();
 
 	m_vel.set(dir.x * m_max_speed, dir.y * m_max_speed);
 
-	setPos(cx, cy);
-
-	p_score_p1 = score_p1;
-	p_score_p2 = score_p2;
+	setCen(cx, cy);
 }
 
-void Ball::setPos(float cx, float cy)
+void Ball::setCen(float cx, float cy)
 {
 	m_cen.set(cx, cy);
 
-	render_rect.x = (int) (cx - m_size / 2);
-	render_rect.y = (int) (cy - m_size / 2);
+	m_object_quad.setCenter(cx, cy);
 }
 
-void Ball::setPos(Vector2 pos)
+void Ball::setCen(Vector2 pos)
 {
-	setPos(pos.x, pos.y);
+	setCen(pos.x, pos.y);
+}
+
+int Ball::getSize()
+{
+	return m_size;
 }
 
 void Ball::render(SDL_Renderer* renderer)
 {
 	SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
-	SDL_RenderFillRect(renderer, &render_rect); //Left paddle
+	SDL_RenderFillRect(renderer, &m_object_quad.getRect()); //Left paddle
+	
+	
+	//Visual debug info
+	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+	std::vector<Vector2> v_ball_corners = m_object_quad.getCorners();
+	for (int i = 0; i < 4; i++)
+	{
+		Vector2 ball_corner = v_ball_corners.at(i);
+		Vector2 ball_corner_next = ball_corner + m_vel.norm(m_dist_rem);
+		SDL_RenderDrawLine(renderer, (int)ball_corner.x, (int)ball_corner.y, (int)ball_corner_next.x, (int)ball_corner_next.y);
+	}
+	
 }
 
-void Ball::move(Paddle pad1, Paddle pad2, SDL_Rect border)
+void Ball::move()
 {
-	//Reset travel distance
-	m_dist_rem = m_vel.mod();
-
-	//Calculate and move intersections	
-	bool f1, f2, f3;
-	do {
-		f1 = bounceQuad(pad1.getTopLeft(), pad1.getTopRight(), pad1.getBotLeft(), pad1.getBotRight()); //with left paddle
-		f2 = bounceQuad(pad2.getTopLeft(), pad2.getTopRight(), pad2.getBotLeft(), pad2.getBotRight()); //with right paddle
-		std::vector<Vector2> corners = Vector2::getCorners(border);
-		Vector2 collision;
-		f3 = bounceQuad(corners[0], corners[1], corners[2], corners[3], &collision); //with borders
-
-		if (f3)
-		{
-			if (collision.x == g_margin_x) //Left side
-			{
-				*p_score_p2 += 1;
-				setPos( (float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
-
-			}
-			if (collision.x == g_screen_width - g_margin_x) //Right side
-			{
-				*p_score_p1 += 1;
-				setPos((float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
-			}
-
-		}
-
-	} while (f1 || f2 || f3);
-
 	//Normal movement
 	if (m_dist_rem > 0)
 	{
 		Vector2 new_cen = m_cen + m_vel.norm(m_dist_rem);
-		setPos(new_cen);
+		setCen(new_cen);
 	}
 }
 
-bool Ball::bounceQuad(Vector2 v_top_left, Vector2 v_top_right, Vector2 v_bot_left, Vector2 v_bot_right, Vector2* collision)
+bool Ball::bounceQuad(Vector2 v_corner_1, Vector2 v_corner_2, Vector2 v_corner_3, Vector2 v_corner_4, Vector2* coll_point)
 {
 	//Next center under regualr movement
-	m_next_cen = m_cen + m_vel.norm(m_dist_rem);
+	//m_next_cen = m_cen + m_vel.norm(m_dist_rem);
 
-	struct reflection
+	struct Collision
 	{
 		Vector2 point;
-		int axis;
+		Vector2 normal;
+		Vector2 corner_relative;
 	};
 
-	std::vector<reflection> v_intersecciones;
+	//Paddle or wall corners
+	std::vector<Vector2> target_corners;
+	target_corners.push_back(v_corner_1);
+	target_corners.push_back(v_corner_2);
+	target_corners.push_back(v_corner_3);
+	target_corners.push_back(v_corner_4);
+
+	//Ball corners
+	std::vector<Vector2> v_ball_corners = m_object_quad.getCorners();
+
+	std::vector<Collision> v_intersecciones;
 	Vector2 aux_intersect;
+	
+	//Check for corner - corner collision
+	for (int i = 0; i < 4; i++)
+	{
+		Vector2 ball_corner = v_ball_corners.at(i);
+		Vector2 ball_corner_next = ball_corner + m_vel.norm(m_dist_rem);
+		
+		for (int j = 0; j < 4; j++)
+		{
+			Vector2 target_corner = target_corners.at(j);
 
-	/*
-	//Top right line
-	Vector2 top_right(m_cen.x - m_size/2, m_cen.y - m_size / 2);
-	Vector2 top_right_next(m_next_cen.x - m_size / 2, m_next_cen.y - m_size / 2);
-	//Top left line
-	Vector2 top_left(m_cen.x + m_size / 2, m_cen.y - m_size / 2);
-	Vector2 top_left_next(m_next_cen.x + m_size / 2, m_next_cen.y - m_size / 2);
-	//Bottom right line
-	Vector2 bottom_right(m_cen.x - m_size / 2, m_cen.y + m_size / 2);
-	Vector2 bottom_right_next(m_next_cen.x - m_size / 2, m_next_cen.y + m_size / 2);
-	//Bottom left line
-	Vector2 bottom_left(m_cen.x + m_size / 2, m_cen.y + m_size / 2);
-	Vector2 bottom_left_next(m_next_cen.x + m_size / 2, m_next_cen.y + m_size / 2);
-	*/
+			//If corner collision move a bit
+			if (Vector2::isPointInSegment(ball_corner, ball_corner_next, target_corner))
+			{
+				setCen(m_cen.x - m_vel.x*0.1, m_cen.y);
+			}
 
-	//Intersection with right side
-	/*if (Vector2::intersectSegments(top_right, top_right_next, v_top_right, v_bot_right, &aux_intersect) ||
-		Vector2::intersectSegments(top_left, top_left_next, v_top_right, v_bot_right, &aux_intersect) ||
-		Vector2::intersectSegments(bottom_right, bottom_right_next, v_top_right, v_bot_right, &aux_intersect) ||
-		Vector2::intersectSegments(bottom_left, bottom_left_next, v_top_right, v_bot_right, &aux_intersect) ) */
-	if (Vector2::intersectSegments(m_cen, m_next_cen, v_top_right, v_bot_right, &aux_intersect))
-	{
-		//Copy intersection to vector
-		v_intersecciones.emplace_back(reflection{ aux_intersect , AXIS_X });
-	}	
-	//Intersection with left side
-	if (Vector2::intersectSegments(m_cen, m_next_cen, v_top_left, v_bot_left, &aux_intersect))
-	{
-		//Copy intersection to vector
-		v_intersecciones.emplace_back(reflection{ aux_intersect , AXIS_X });
-	}
-	//Intersection with top side
-	if (Vector2::intersectSegments(m_cen, m_next_cen, v_top_left, v_top_right, &aux_intersect))
-	{
-		//Copy intersection to vector
-		v_intersecciones.emplace_back(reflection{ aux_intersect , AXIS_Y });
-	}
-	//Intersection with bottom side
-	if (Vector2::intersectSegments(m_cen, m_next_cen, v_bot_left, v_bot_right, &aux_intersect))
-	{
-		//Copy intersection to vector
-		v_intersecciones.emplace_back(reflection{ aux_intersect , AXIS_Y });
+		}
 	}
 
-	Vector2 contact_point;
-	int reflection_axis;
+
+
+
+	//For every ball corner
+	for (int i = 0; i < 4; i++)
+	{
+		Vector2 ball_corner = v_ball_corners.at(i);
+		Vector2 ball_corner_next = ball_corner + m_vel.norm(m_dist_rem);
+		Vector2 corner_relative = ball_corner - m_cen;
+
+		//Calculate intersections, taking points in pairs to form segments.
+		//Take every corner-side pair
+		//Segment normal is calculated clockwise. When points are passed clockise, normals point inwards, and vice versa.
+		for (int j = 0; j < 4; j++)
+		{
+			Vector2 p1 = target_corners.at(j);
+			Vector2 p2;
+			if (j < 3) p2 = target_corners.at(j + 1);
+			else p2 = target_corners.at(0); //Pair last to first
+
+			//Intersection with side
+			if (Vector2::intersectSegments(ball_corner, ball_corner_next, p1, p2, &aux_intersect))
+			{
+				//Copy intersection to vector
+				v_intersecciones.emplace_back(Collision{ aux_intersect, Vector2::getSegmentNormal(p1, p2), corner_relative });
+			}
+		}
+	}
+
+	Collision collision;
 	float min_dist = 100000;
 
 	//Use the closest intersection to the ball center
@@ -150,12 +143,11 @@ bool Ball::bounceQuad(Vector2 v_top_left, Vector2 v_top_right, Vector2 v_bot_lef
 		//get distance
 		for (auto it = v_intersecciones.begin(); it != v_intersecciones.end(); it++)
 		{
-			float dist = it->point.dist(m_cen);
-			if (dist < min_dist) //Store point if dist < min
+			float dist = it->point.dist(m_cen + it->corner_relative);
+			if (dist < min_dist) //Store point if distance from corner < min
 			{
-				min_dist = dist;
-				contact_point = it->point;
-				reflection_axis = it->axis;
+				min_dist = dist; //Calculate distance from corner
+				collision = *it;
 			}
 		}
 	}
@@ -164,26 +156,24 @@ bool Ball::bounceQuad(Vector2 v_top_left, Vector2 v_top_right, Vector2 v_bot_lef
 		return false; //No collision
 	}
 
+	m_next_cen = collision.point - collision.corner_relative;
+
 	//Remaining distance to travel after collision
-	m_dist_rem = m_vel.mod() - min_dist;
+	m_dist_rem -= min_dist;
 
-	//Reflect the appropriate speed component
-	if (reflection_axis == AXIS_X)
-	{
-		m_vel.x *= -1;
-	}
-	if (reflection_axis == AXIS_Y)
-	{
-		m_vel.y *= -1;
-	}
+	//Move ball to just before collision
+	setCen(m_next_cen - m_vel.norm(0.1f));
 
-	if (collision != NULL)
+	//Reflect the appropriate speed component: r = d - 2(d·n)n
+	m_vel = m_vel - collision.normal * 2 * (m_vel * collision.normal);
+
+	if (coll_point != NULL)
 	{
-		*collision = contact_point;
+		*coll_point = collision.point;
 	}
 
-	//Travel remaining distance from the collision point
-	setPos(contact_point + m_vel.norm(0.1f));
+	//Move remaining distance
+	move();
 	return true;
 
 }

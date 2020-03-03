@@ -10,16 +10,23 @@ As of time of creation, the program just generates a back window where two white
 - Added ball and collision system
 
 ## Bugs:
-- The ball can get through a wall if it hits just in the corner
-- Moving the paddles into the ball traps the ball inside the paddle
+- ~~The ball can get through a wall if it hits just in the corner~~ P 0.3: Ball position capped to game area
+- ~~Moving the paddles into the ball traps the ball inside the paddle~~ P 0.3: Fixed thanks to the interaction observer
+- ~~When the ball hits the left paddle's top corners it can get trapped inside the paddle (failure to detect corner collision)~~ P 0.3: Fixed correcting collision calculation 
 
 ## P 0.3 ToDo list:
 - [x] Add timers to cap fps
 - [x] Add text and score
-- [ ] Use normals for automatic reflection calculation in collisions
-- [ ] Use the whole ball for collision instead of just the center for extra accurate collisions (should fix collision bugs)
+- [x] Use normals for automatic reflection calculation in collisions
+- [x] Use the whole ball for collision instead of just the center for extra accurate (and satisfying) collisions (should fix collision bugs)
+- [x] Fix wonky paddle collision
 
-## P 0.4 ToDO list:
+## P 0.3 other changes:
+- Added an interaction observer (following design pattern) to handle game object interactions
+- Added Quad class as a float analog to SDL_Rect with expanded functionality
+- Fixed collision bugs
+
+## P 0.4 ToDo list:
 - [ ] Add different game states
 - [ ] Add start screen
 - [ ] Add pause screen (with info)
