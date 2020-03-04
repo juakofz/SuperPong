@@ -24,6 +24,31 @@ DashedLine::DashedLine(int x, int y, int w, int h, int dash_size, bool vertical)
 
 }
 
+DashedLine::DashedLine()
+{
+	m_ox = 0;
+	m_oy = 0;
+	m_width = 0;
+	m_height = 0;
+	m_dash_size = 0;
+
+	
+}
+
+DashedLine& DashedLine::operator=(const DashedLine& obj)
+{
+	m_ox = obj.m_ox;
+	m_oy = obj.m_oy;
+	m_width = obj.m_width;
+	m_height = obj.m_height;
+	m_dash_size = obj.m_dash_size;
+
+	//Rectangles
+	v_rects = obj.v_rects;
+
+	return *this;
+}
+
 DashedLine::~DashedLine()
 {
 }

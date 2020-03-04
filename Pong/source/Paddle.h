@@ -16,6 +16,7 @@ class Paddle :
 
 public:
 
+	Paddle();
 	Paddle(int player, float cx, float cy);
 	
 	void render(SDL_Renderer* renderer);
@@ -30,8 +31,8 @@ public:
 private:
 
 	//Paddle parameters
-	int m_width = 10;
-	int m_height = 50;
+	int m_width = 2 * g_px_size;
+	int m_height = 10 * g_px_size;
 	int m_margin_x;
 	int m_margin_y = m_height / 2;
 	float m_max_speed = adjustSpeed(300.0f); // in px/second

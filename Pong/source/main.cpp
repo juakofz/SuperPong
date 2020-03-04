@@ -2,13 +2,13 @@
 #include <iostream>
 #include <SDL.h>
 #include "Globals.h"
+#include "Game.h"
 #include "Text.h"
 #include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "DashedLine.h"
 #include "InteractionObserver.h"
-
 
 // ------------------------------------------------- Global objects
 
@@ -53,7 +53,9 @@ int main(int argc, char* args[])
 
 	//------------------------------------------------------------------------- Game objects and variables
 
+	Game game(gWindow,gRenderer);
 
+	/*
 	//Player score
 	int score_p1{ 0 }, score_p2{ 0 };
 
@@ -89,6 +91,7 @@ int main(int argc, char* args[])
 
 	SDL_Color color_white{ 0xFF, 0xFF, 0xFF, 0xFF }; //White
 	SDL_Color color_black{ 0x00, 0x00, 0x00, 0xFF }; //White
+	*/
 
 	//FPS cap variables
 	Timer fps_timer, cap_timer;
@@ -140,6 +143,9 @@ int main(int argc, char* args[])
 
 		//--------------------------------------------------------------------- Game
 
+		game.run();
+
+		/*
 		//Key is down
 		pad_left.processKeys();
 		pad_right.processKeys();
@@ -155,6 +161,7 @@ int main(int argc, char* args[])
 
 		text_score_p2.free();
 		text_score_p2.loadText(std::to_string(score_p2), font, score_size, color_white);
+		*/
 
 
 		//--------------------------------------------------------------------- Rendering
@@ -163,6 +170,8 @@ int main(int argc, char* args[])
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(gRenderer);
 
+		game.render();
+		/*
 		//Render background rectangles
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderFillRect(gRenderer, &bg_white); //white line
@@ -181,9 +190,16 @@ int main(int argc, char* args[])
 		pad_left.render(gRenderer);
 		pad_right.render(gRenderer);
 		ball.render(gRenderer);
+		*/
 
 		//Update the surface
-		SDL_UpdateWindowSurface(gWindow);
+		//SDL_UpdateWindowSurface(gWindow);
+
+		//Update screen
+		SDL_RenderPresent(gRenderer);
+
+		//Render texture to screen
+		//SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 
 		//Update screen
 		SDL_RenderPresent(gRenderer);
@@ -262,8 +278,13 @@ bool loadMedia()
 void close()
 {
 	//Destroy window
+	SDL_DestroyRenderer(gRenderer);
 	SDL_DestroyWindow(gWindow);
+	gRenderer = NULL;
+	gWindow = NULL;
 
 	//Quit SDL subsystems
+	IMG_Quit();
 	SDL_Quit();
+	TTF_Quit();
 }

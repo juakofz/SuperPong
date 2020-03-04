@@ -7,6 +7,9 @@ class DashedLine
 public:
 
 	DashedLine(int x, int y, int w, int h, int dash_size, bool vertical = true);
+	DashedLine();
+	DashedLine& operator=(const DashedLine& obj);
+
 	~DashedLine();
 	void render(SDL_Renderer* renderer);
 
@@ -18,7 +21,6 @@ private:
 	int m_height;
 
 	int m_dash_size;
-	float m_dash_ratio;
 
 	//Colors
 	const SDL_Color m_color_1{ 0xFF, 0xFF, 0xFF, 0xFF }; //White

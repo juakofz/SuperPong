@@ -14,7 +14,7 @@ As of time of creation, the program just generates a back window where two white
 - ~~Moving the paddles into the ball traps the ball inside the paddle~~ P 0.3: Fixed thanks to the interaction observer
 - ~~When the ball hits the left paddle's top corners it can get trapped inside the paddle (failure to detect corner collision)~~ P 0.3: Fixed correcting collision calculation 
 
-## P 0.3 ToDo list:
+## P 0.3:
 - [x] Add timers to cap fps
 - [x] Add text and score
 - [x] Use normals for automatic reflection calculation in collisions
@@ -27,7 +27,15 @@ As of time of creation, the program just generates a back window where two white
 - Fixed collision bugs
 
 ## P 0.4 ToDo list:
-- [ ] Add different game states
+- [x] Switch to hardware accelerated rendering
+- [x] Allow vertical text alignment
+- [x] Add support for different game states
 - [ ] Add start screen
 - [ ] Add pause screen (with info)
 - [ ] Add end confirmation screen
+- [ ] Change paddle collision angle in relation to hit distance from center
+- [ ] Fix wonky paddle collision again
+
+## P 0.4 other changes:
+- Added some internal code for things
+- Added 3s countdown before the game begins, with graphics!

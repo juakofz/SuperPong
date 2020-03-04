@@ -1,5 +1,12 @@
 #include "InteractionObserver.h"
 
+InteractionObserver::InteractionObserver()
+{
+	p_score_p1 = NULL;
+	p_score_p2 = NULL;
+	p_walls = NULL;
+}
+
 InteractionObserver::InteractionObserver(int* score_p1, int* score_p2, SDL_Rect* walls)
 {
 	p_score_p1 = score_p1;
@@ -44,7 +51,7 @@ void InteractionObserver::movePaddles()
 				Ball* ball = *it_ball;
 
 				//Vertical collision with ball
-				float margin = (ball->getSize() / 2.0f) * 1.1;
+				float margin = (ball->getSize() / 2.0f) * 0.1;
 
 				if (ball->getCen().x >= pad->getQuad().getTopLeft().x - margin &&
 					ball->getCen().x <= pad->getQuad().getTopRight().x + margin)

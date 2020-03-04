@@ -17,6 +17,8 @@ public:
 
 	//Gets the timer's time
 	Uint32 getTicks();
+
+	//Gets the timer's time in seconds
 	float getSecs();
 
 	//Checks the status of the timer

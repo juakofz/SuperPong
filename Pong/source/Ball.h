@@ -29,7 +29,7 @@ private:
 
 	float m_max_speed = adjustSpeed(300.0f); // in px/second
 
-	int m_size = 10;
+	int m_size = 2 * g_px_size;
 
 	Quad m_object_quad;
 

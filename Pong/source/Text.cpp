@@ -1,8 +1,19 @@
 #include "Text.h"
 
+Text::Text()
+{
+	m_texture = NULL;
+	m_font = NULL;
+	m_size.x = 0;
+	m_size.y = 0;
+
+	p_renderer = NULL;
+}
+
 Text::Text(SDL_Renderer* renderer)
 {
 	m_texture = NULL;
+	m_font = NULL;
 	m_size.x = 0;
 	m_size.y = 0;
 
@@ -87,22 +98,46 @@ void Text::free()
 	}
 }
 
-void Text::render(SDL_Renderer* renderer, int x, int y, int align, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Text::render(SDL_Renderer* renderer, int x, int y, int align_horizontal, int align_vertical, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	SDL_Rect renderQuad;
 
 	//Espacio de renderizado
-	switch (align)
+	int cx{ 0 }, cy{ 0 };
+
+	switch (align_horizontal)
 	{
 	case LEFT:
-		renderQuad = { x, y, (int)m_size.x, (int)m_size.y };
+		cx = x;
 		break;
 	case RIGHT:
-		renderQuad = { x - (int)m_size.x, y, (int)m_size.x, (int)m_size.y };
+		cx = x - (int)m_size.x;
+		break;
+	case CENTER:
+		cx = x - (int)m_size.x/2;
 		break;
 	default:
+		cx = x;
 		break;
 	}
+
+	switch (align_vertical)
+	{
+	case TOP:
+		cy = y;
+		break;
+	case BOTTOM:
+		cy = y - (int)m_size.y;
+		break;
+	case CENTER:
+		cy = y - (int)m_size.y / 2;
+		break;
+	default:
+		cy = y;
+		break;
+	}
+
+	renderQuad = { cx, cy, (int)m_size.x, (int)m_size.y };
 
 	//Espacio final de renderizado de renderizado
 	if (clip != NULL)

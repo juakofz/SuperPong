@@ -43,11 +43,12 @@ enum players {
     PLAYER_2
 };
 
-enum directions {
-    UP,
-    DOWN,
+enum alignment {
+    TOP,
+    BOTTOM,
     LEFT,
-    RIGHT
+    RIGHT,
+    CENTER
 };
 
 enum corners {

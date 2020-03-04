@@ -11,7 +11,8 @@ class InteractionObserver
 	friend class Paddle;
 
 public:
-	
+
+	InteractionObserver();
 	InteractionObserver(int* score_p1, int* score_p2, SDL_Rect* p_walls);	
 	~InteractionObserver();
 

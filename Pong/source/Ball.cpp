@@ -2,13 +2,13 @@
 
 Ball::Ball() :GameObject()
 {
-	m_object_quad.setSize(m_size, m_size);
+	m_object_quad.setSize((float)m_size, (float)m_size);
 	m_dist_rem = m_vel.mod();
 }
 
 Ball::Ball(float cx, float cy, Vector2 dir, int* score_p1, int* score_p2)
 {
-	m_object_quad.setSize(m_size, m_size);
+	m_object_quad.setSize((float)m_size, (float)m_size);
 	m_dist_rem = m_vel.mod();
 
 	m_vel.set(dir.x * m_max_speed, dir.y * m_max_speed);
@@ -38,7 +38,7 @@ void Ball::render(SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
 	SDL_RenderFillRect(renderer, &m_object_quad.getRect()); //Left paddle
 	
-	
+	/*
 	//Visual debug info
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 	std::vector<Vector2> v_ball_corners = m_object_quad.getCorners();
@@ -48,7 +48,7 @@ void Ball::render(SDL_Renderer* renderer)
 		Vector2 ball_corner_next = ball_corner + m_vel.norm(m_dist_rem);
 		SDL_RenderDrawLine(renderer, (int)ball_corner.x, (int)ball_corner.y, (int)ball_corner_next.x, (int)ball_corner_next.y);
 	}
-	
+	*/
 }
 
 void Ball::move()
@@ -63,8 +63,6 @@ void Ball::move()
 
 bool Ball::bounceQuad(Vector2 v_corner_1, Vector2 v_corner_2, Vector2 v_corner_3, Vector2 v_corner_4, Vector2* coll_point)
 {
-	//Next center under regualr movement
-	//m_next_cen = m_cen + m_vel.norm(m_dist_rem);
 
 	struct Collision
 	{
@@ -104,9 +102,6 @@ bool Ball::bounceQuad(Vector2 v_corner_1, Vector2 v_corner_2, Vector2 v_corner_3
 
 		}
 	}
-
-
-
 
 	//For every ball corner
 	for (int i = 0; i < 4; i++)

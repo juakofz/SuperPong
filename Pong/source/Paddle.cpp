@@ -1,5 +1,12 @@
 #include "Paddle.h"
 
+Paddle::Paddle()
+{
+	m_player = 0;
+	m_margin_x = 0;
+	setCen(0, 0);
+}
+
 Paddle::Paddle(int player, float cx, float cy)
 {
 	m_object_quad.setSize(m_width, m_height);
