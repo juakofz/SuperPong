@@ -33,6 +33,7 @@ public:
 	void zero();
 	float dist(Vector2 dest); //Distance to vector
 	Vector2 norm(float d = 1.0); //Get normalized vector (or resize to n)
+	Vector2 rotate(float angle); //Rotate vector
 	Vector2 normal(bool clockwise = true);
 	float mod();
 	float arg();

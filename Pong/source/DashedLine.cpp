@@ -2,8 +2,18 @@
 
 DashedLine::DashedLine(int x, int y, int w, int h, int dash_size, bool vertical)
 {
-	m_ox = x;
-	m_oy = y;
+	//Horizontal line
+	if (w >= h)
+	{
+		m_ox = x;
+		m_oy = y - h / 2;
+	}
+	else
+	{
+		m_ox = x - w / 2;
+		m_oy = y;
+	}
+
 	m_width = w;
 	m_height = h;
 	m_dash_size = dash_size;

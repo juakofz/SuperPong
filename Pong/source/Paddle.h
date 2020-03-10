@@ -25,6 +25,7 @@ public:
 	
 	void setCen(float cx, float cy);
 	void setCen(Vector2 pos);
+	void reset();
 	SDL_Point getSize();
 	Quad getQuad();
 

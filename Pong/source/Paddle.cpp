@@ -9,6 +9,9 @@ Paddle::Paddle()
 
 Paddle::Paddle(int player, float cx, float cy)
 {
+	m_initial_cen.x = cx;
+	m_initial_cen.y = cy;
+
 	m_object_quad.setSize(m_width, m_height);
 
 	m_player = player;
@@ -21,6 +24,13 @@ void Paddle::render(SDL_Renderer* renderer)
 {
 	SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
 	SDL_RenderFillRect(renderer, &m_object_quad.getRect()); //Left paddle
+
+	/*
+	//debug collision rect
+	SDL_SetRenderDrawColor(renderer, m_color.r, 0, 0, m_color.a);
+	SDL_Rect red_rect{m_object_quad.getTopLeft().x - g_px_size, m_object_quad.getTopLeft().y - g_px_size, m_width + 2 * g_px_size, m_height + 2 * g_px_size };
+	SDL_RenderDrawRect(renderer, &red_rect); //Left paddle
+	*/
 }
 
 void Paddle::processKeys()
@@ -66,6 +76,12 @@ void Paddle::setCen(Vector2 pos)
 	setCen(pos.x, pos.y);
 }
 
+void Paddle::reset()
+{
+	setCen(m_initial_cen);
+	setVel(Vector2(0, 0));
+}
+
 SDL_Point Paddle::getSize()
 {
 	return SDL_Point{m_width, m_height};
@@ -80,6 +96,6 @@ void Paddle::move(float max_mov)
 {
 	Vector2 new_cen = m_cen + m_vel.norm(max_mov);
 	setCen(new_cen); //Move to new center
-	m_vel.zero(); //Cancel velocity
+	m_vel.zero(); //Cancel previous velocity
 }
 

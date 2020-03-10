@@ -13,7 +13,7 @@ class InteractionObserver
 public:
 
 	InteractionObserver();
-	InteractionObserver(int* score_p1, int* score_p2, SDL_Rect* p_walls);	
+	InteractionObserver(int* score_p1, int* score_p2, bool* scored_flag, SDL_Rect* p_walls);
 	~InteractionObserver();
 
 	void add(Ball* ball);
@@ -32,5 +32,6 @@ private:
 	//Pointer to player score
 	int* p_score_p1;
 	int* p_score_p2;
+	bool* p_scored_flag;
 };
 

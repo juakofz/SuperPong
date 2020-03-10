@@ -4,13 +4,15 @@ InteractionObserver::InteractionObserver()
 {
 	p_score_p1 = NULL;
 	p_score_p2 = NULL;
+	p_scored_flag = NULL;
 	p_walls = NULL;
 }
 
-InteractionObserver::InteractionObserver(int* score_p1, int* score_p2, SDL_Rect* walls)
+InteractionObserver::InteractionObserver(int* score_p1, int* score_p2, bool* scored_flag, SDL_Rect* walls)
 {
 	p_score_p1 = score_p1;
 	p_score_p2 = score_p2;
+	p_scored_flag = scored_flag;
 	p_walls = walls;
 }
 
@@ -51,18 +53,25 @@ void InteractionObserver::movePaddles()
 				Ball* ball = *it_ball;
 
 				//Vertical collision with ball
-				float margin = (ball->getSize() / 2.0f) * 0.1;
+				float margin = (ball->getSize() / 2.0f) + 0.1f;
 
-				if (ball->getCen().x >= pad->getQuad().getTopLeft().x - margin &&
-					ball->getCen().x <= pad->getQuad().getTopRight().x + margin)
+				float quad_left_limit = pad->getQuad().getTopLeft().x - margin;
+				float quad_right_limit = pad->getQuad().getTopRight().x + margin;
+				float quad_top_limit = pad->getQuad().getTopLeft().y - margin;
+				float quad_bottom_limit = pad->getQuad().getBotLeft().y + margin;
+
+				//x axis
+				if (ball->getCen().x >= quad_left_limit &&
+					ball->getCen().x <= quad_right_limit)
 				{
-					//Remember y is positive downwards!
-					if (pad->getQuad().getTopLeft().y + pad->getVel().y - margin <= ball->getCen().y &&
-						pad->getQuad().getBotLeft().y + pad->getVel().y + margin >= ball->getCen().y)
+					//y axis - remember y is positive downwards!
+					if (ball->getCen().y >= quad_top_limit + pad->getVel().y &&
+						ball->getCen().y <= quad_bottom_limit + pad->getVel().y)
 					{
-						max_movement = std::min(abs(ball->getCen().y - (pad->getQuad().getTopLeft().y + pad->getVel().y - margin)),
-												abs(ball->getCen().y - (pad->getQuad().getBotLeft().y + pad->getVel().y + margin)));
-						if (max_movement >= 0.1f) max_movement -= 0.1f;
+						//Min distance
+						float dist_top = abs(ball->getCen().y - quad_top_limit);
+						float dist_bottom = abs(ball->getCen().y - quad_bottom_limit);
+						max_movement = std::min(dist_top, dist_bottom);
 					}
 				}
 			}
@@ -99,27 +108,61 @@ void InteractionObserver::moveBalls()
 				Paddle* pad = *it_pad;
 
 				//Bounce
-				f_pads = f_pads || ball->bounceQuad(pad->getQuad().getTopLeft(), pad->getQuad().getBotLeft(), pad->getQuad().getBotRight(), pad->getQuad().getTopRight());
+				Collision collision;
+				if (ball->calculateQuadCollision(pad->getQuad().getTopLeft(), pad->getQuad().getBotLeft(), pad->getQuad().getBotRight(), pad->getQuad().getTopRight(), &collision))
+				{
+					//move
+					ball->bouncePaddle(&collision, pad->getVel());
+
+					//update flag
+					f_pads = true;
+				}
 			}
 			
 			//Collisions with borders
 			std::vector<Vector2> corners = Vector2::getCorners(*p_walls);
-			Vector2 collision;
-			f_walls = ball->bounceQuad(corners[0], corners[1], corners[2], corners[3], &collision); 
+			Collision collision;
+			if (ball->calculateQuadCollision(corners[0], corners[1], corners[2], corners[3], &collision))
+			{
+				//move
+				ball->bounceBorder(&collision);
+
+				//update flag
+				f_walls = true;
+			}
 
 			//calculate points
 			if (f_walls)
 			{
-				if (collision.x == g_margin_x) //Left side
+				float max_angle = 40;
+
+				if (collision.point.x == g_margin_x) //Left side
 				{
 					*p_score_p2 += 1;
-					ball->setCen((float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
+					*p_scored_flag = true;
 
+					//Random start angle towards rigth
+					float max = max_angle;
+					float min = - max_angle;
+					float angle = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+					Vector2 vel;
+					vel = Vector2::angleToVec2(angle);
+					ball->setVel(vel);
+					ball->reset((float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
 				}
-				if (collision.x == g_screen_width - g_margin_x) //Right side
+				if (collision.point.x == g_screen_width - g_margin_x) //Right side
 				{
 					*p_score_p1 += 1;
-					ball->setCen((float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
+					*p_scored_flag = true;
+
+					//Random start angle towards left
+					float max = 180 + max_angle;
+					float min = 180 - max_angle;
+					float angle = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+					Vector2 vel;
+					vel = Vector2::angleToVec2(angle);
+					ball->setVel(vel);
+					ball->reset((float)g_screen_width / 2.0, (float)g_screen_height / 2.0);
 				}
 			}
 

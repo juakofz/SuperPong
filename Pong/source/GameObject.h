@@ -7,8 +7,8 @@
 class GameObject
 {
 public:
-	GameObject(): m_cen(0, 0), m_vel(0, 0) {};
-	GameObject(float px, float py) : m_cen(px, py), m_vel(0, 0) {};
+	GameObject(): m_initial_cen(0, 0), m_cen(0, 0), m_vel(0, 0) {};
+	GameObject(float px, float py) : m_initial_cen(px, py), m_cen(px, py), m_vel(0, 0) {};
 	~GameObject();
 
 	virtual void render(SDL_Renderer* renderer) = 0;
@@ -25,6 +25,7 @@ public:
 protected:
 	
 	//Position
+	Vector2 m_initial_cen{ 0, 0 };
 	Vector2 m_cen;
 	Vector2 m_next_cen;
 

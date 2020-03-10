@@ -1,5 +1,7 @@
 #pragma once
 #include <algorithm>
+#include <SDL.h>
+#include "Vector2.h"
 
 // ------------------------------------------------- Global objects and constants
 
@@ -66,3 +68,16 @@ T clip(const T & n, const T & lower, const T & upper) {
 }
 
 float adjustSpeed(float s);
+
+void setRenderDrawColorWhite(SDL_Renderer* renderer);
+void setRenderDrawColorBlack(SDL_Renderer* renderer);
+
+// ------------------------------------------------- Structures
+
+struct Collision
+{
+    Vector2 point;
+    Vector2 normal;
+    Vector2 corner_relative;
+    float center_distance;
+};

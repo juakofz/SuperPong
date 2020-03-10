@@ -20,15 +20,22 @@ Timer::~Timer()
 
 void Timer::start()
 {
-	//Start the timer
-	started = true;
+	if (started && paused)
+	{
+		unpause();
+	}
+	else
+	{
+		//Start the timer
+		started = true;
 
-	//Unpause the timer
-	paused = false;
+		//Unpause the timer
+		paused = false;
 
-	//Get the current clock time
-	startTicks = SDL_GetTicks();
-	pausedTicks = 0;
+		//Get the current clock time
+		startTicks = SDL_GetTicks();
+		pausedTicks = 0;
+	}
 }
 
 void Timer::stop()

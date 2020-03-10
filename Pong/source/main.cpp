@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <SDL.h>
+#include <cstdlib>
 #include "Globals.h"
 #include "Game.h"
 #include "Text.h"
@@ -45,15 +46,22 @@ int main(int argc, char* args[])
 		printf("Failed to load media!");
 		return -1;
 	}
+
+
+	srand(SDL_GetTicks());
+
 	//Main loop flag
 	bool f_quit = false;
+	bool f_pause = false;
 
 	//Event handler
 	SDL_Event e;
 
 	//------------------------------------------------------------------------- Game objects and variables
 
-	Game game(gWindow,gRenderer);
+	SDL_Texture* render_texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_TARGET, g_screen_width, g_screen_height);
+	Game game(gWindow,gRenderer, render_texture, &f_quit);
 
 	/*
 	//Player score
@@ -125,9 +133,14 @@ int main(int argc, char* args[])
 					printf("Quit key pressed");
 					f_quit = true;
 					break;
+				case SDLK_p:
+					//printf("Pause key pressed");
+					f_pause = true;
+					break;
 				}
 			}
 		}
+	
 
 		//--------------------------------------------------------------------- FPS counter
 
@@ -142,6 +155,11 @@ int main(int argc, char* args[])
 		//std::cout << "FPS: " << avgFPS << std::endl;
 
 		//--------------------------------------------------------------------- Game
+
+		if (f_pause)
+		{
+			game.togglePause();
+		}
 
 		game.run();
 
@@ -167,8 +185,8 @@ int main(int argc, char* args[])
 		//--------------------------------------------------------------------- Rendering
 
 		//Clear screen
-		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-		SDL_RenderClear(gRenderer);
+		//SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
+		//SDL_RenderClear(gRenderer);
 
 		game.render();
 		/*
@@ -196,10 +214,13 @@ int main(int argc, char* args[])
 		//SDL_UpdateWindowSurface(gWindow);
 
 		//Update screen
-		SDL_RenderPresent(gRenderer);
+		//SDL_RenderPresent(gRenderer);
+
+		//reset render target to default (screen)
+		SDL_SetRenderTarget(gRenderer, NULL); 
 
 		//Render texture to screen
-		//SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
+		SDL_RenderCopy(gRenderer, render_texture, NULL, NULL);
 
 		//Update screen
 		SDL_RenderPresent(gRenderer);
@@ -214,6 +235,10 @@ int main(int argc, char* args[])
 			SDL_Delay(g_ticks_per_frame - frameTicks);
 		}
 
+		//--------------------------------------------------------------------- Other
+
+		//Reset pause flag
+		f_pause = false;
 	}
 
 	close();

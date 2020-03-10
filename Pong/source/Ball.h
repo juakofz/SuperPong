@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL.h>
 #include <vector>
+#include <iostream>
+#include <cmath>
 #include "GameObject.h"
 #include "Globals.h"
 #include "Quad.h"
@@ -22,12 +24,17 @@ public:
 	void setCen(float cx, float cy);
 	void setCen(Vector2 pos);
 	int getSize();
-	bool bounceQuad(Vector2 v1, Vector2 v2, Vector2 v3, Vector2 v4, Vector2* collision = NULL);
+	bool calculateQuadCollision(Vector2 v1, Vector2 v2, Vector2 v3, Vector2 v4, Collision* coll = NULL);
+	void bounceBorder(Collision* coll);
+	void bouncePaddle(Collision* coll, Vector2 pad_speed);
 	void move();
+	void reset(float cx, float cy);
 
 private:
 
-	float m_max_speed = adjustSpeed(300.0f); // in px/second
+	float m_initial_speed = adjustSpeed(300.0f); // in px/second
+	float m_max_speed = m_initial_speed;
+	float m_accel_rate = 1.05;
 
 	int m_size = 2 * g_px_size;
 

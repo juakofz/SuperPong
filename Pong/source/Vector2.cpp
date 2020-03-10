@@ -112,9 +112,19 @@ float Vector2::dist(Vector2 dest)
 
 Vector2 Vector2::norm(float d)
 {
+	if (mod() < 0.001)
+		return *this;
+
 	Vector2 aux;
 	aux.x = d * x / mod();
 	aux.y = d * y / mod();
+	return aux;
+}
+
+Vector2 Vector2::rotate(float angle)
+{
+	Vector2 aux = angleToVec2(arg() + angle);
+	aux = aux.norm(mod());
 	return aux;
 }
 
