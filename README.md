@@ -28,15 +28,14 @@ As of time of creation, the program just generates a back window where two white
 - [x] Add pause screen
 - [x] Add score limit
 - [x] Add game end screen and reset
-- [x] Change change ball speed in relation to distance from center
-- [ ] Fix wonky paddle collision again
+- [x] Change change ball speed in relation to distance from center paddle center in collision
+- [x] Fix wonky paddle collision again
 
 #### P 0.4 other changes:
 - Added some internal code for things
 - Added 3s countdown before the game begins, with graphics!
 - Fixed document structure :p
 - Added score limit per game
-- Ball speed goes up as the game goes on
 
 ### P 0.5 ToDo list:
 - [ ] Add start screen
